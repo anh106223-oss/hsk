@@ -1,0 +1,45 @@
+/* Style các tab con của phần Luyện tập */
+.sub-tab-btn {
+  padding: 0.65rem 0.5rem;
+  background-color: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 0.85rem;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  text-align: center;
+}
+
+.sub-tab-btn:hover {
+  background-color: rgba(30, 41, 59, 0.9);
+  color: #f8fafc;
+  border-color: #64748b;
+}
+
+.sub-tab-btn.active-sub {
+  background-color: rgba(220, 38, 38, 0.15);
+  border-color: #ef4444;
+  color: #f87171;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.2);
+}
+
+.sub-lvl-btn {
+  padding: 0.25rem 0.6rem;
+  border-radius: 0.5rem;
+  color: #94a3b8;
+  font-weight: 600;
+  font-size: 0.7rem;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.sub-lvl-btn:hover {
+  color: #ffffff;
+  background-color: #334155;
+}
+
+.sub-lvl-btn.active {
+  background-color: #dc2626;
+  color: #ffffff;
+}

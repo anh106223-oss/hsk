@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HSK Ultimate - Luyện Âm AI, Luyện Viết & Bài Tập 6 Cấp Độ</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Noto+Serif+SC:wght@600;700;900&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <!-- Hanzi Writer -->
+  <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-['Plus_Jakarta_Sans']">
+
+  <!-- BANNER CẢNH BÁO NẾU ĐANG CHẠY QUA FILE:/// -->
+  <div id="env-warning-banner" class="hidden bg-amber-500/10 border-b border-amber-500/30 px-4 py-2 text-center text-xs text-amber-300 font-semibold">
+    <i class="fa-solid fa-triangle-exclamation mr-1.5 text-amber-400"></i>
+    <span>Bạn đang mở file trực tiếp (file:///). Hãy mở bằng <b>VS Code Live Server</b> hoặc <b>Localhost</b> để trình duyệt cho phép Micro và AI chấm điểm phát âm!</span>
+  </div>
+
+  <!-- TOP HEADER -->
+  <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-600 to-amber-500 flex items-center justify-center shadow-lg shadow-red-600/30">
+          <i class="fa-solid fa-feather-pointed text-white text-lg"></i>
+        </div>
+        <div>
+          <h1 class="font-extrabold text-base tracking-tight text-white flex items-center gap-2">
+            HSK Ultimate <span class="text-[10px] bg-red-600/40 text-red-300 border border-red-500/30 px-2 py-0.5 rounded-full font-bold">HSK 1 - 6</span>
+          </h1>
+          <p class="text-[11px] text-slate-400">Luyện Âm AI • Luyện Viết • Nghe & Ghép Câu</p>
+        </div>
+      </div>
+
+      <!-- Tab Điều Hướng Chính -->
+      <nav class="flex items-center gap-1.5 bg-slate-800/90 p-1 rounded-xl border border-slate-700/60 text-xs md:text-sm">
+        <button onclick="switchMode('speak')" id="nav-speak" class="nav-btn active">
+          <i class="fa-solid fa-microphone mr-1.5"></i>Luyện Đọc AI
+        </button>
+        <button onclick="switchMode('write')" id="nav-write" class="nav-btn">
+          <i class="fa-solid fa-pen-nib mr-1.5"></i>Luyện Viết
+        </button>
+        <button onclick="switchMode('practice')" id="nav-practice" class="nav-btn">
+          <i class="fa-solid fa-graduation-cap mr-1.5"></i>Luyện Tập
+        </button>
+        <button onclick="switchMode('dict')" id="nav-dict" class="nav-btn">
+          <i class="fa-solid fa-book-bookmark mr-1.5"></i>Kho Từ
+        </button>
+      </nav>
+
+      <!-- Nút Tải 6000 Từ Đám Mây -->
+      <button onclick="syncCloud6000Words()" id="btn-cloud-sync" class="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-cloud-arrow-down"></i> <span id="sync-text">Đồng bộ 6.000 từ</span>
+      </button>
+
+    </div>
+  </header>
+
+  <!-- THANH TÌM KIẾM & BỘ LỌC HSK CHUNG -->
+  <div id="global-filter-bar" class="max-w-5xl mx-auto px-4 mt-4 w-full flex flex-col md:flex-row items-center gap-3 justify-between">
+    <div class="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto text-xs py-1">
+      <button onclick="filterByLevel('ALL')" class="lvl-btn active" id="btn-lvl-all">Tất cả</button>
+      <button onclick="filterByLevel(1)" class="lvl-btn" id="btn-lvl-1">HSK 1</button>
+      <button onclick="filterByLevel(2)" class="lvl-btn" id="btn-lvl-2">HSK 2</button>
+      <button onclick="filterByLevel(3)" class="lvl-btn" id="btn-lvl-3">HSK 3</button>
+      <button onclick="filterByLevel(4)" class="lvl-btn" id="btn-lvl-4">HSK 4</button>
+      <button onclick="filterByLevel(5)" class="lvl-btn" id="btn-lvl-5">HSK 5</button>
+      <button onclick="filterByLevel(6)" class="lvl-btn" id="btn-lvl-6">HSK 6</button>
+    </div>
+
+    <div class="relative w-full md:w-80">
+      <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500 text-xs"></i>
+      <input type="text" id="main-search-input" oninput="onSearchWord(this.value)" placeholder="Tra nhanh Hán tự, Pinyin, nghĩa..." class="w-full bg-slate-900 border border-slate-800 focus:border-red-500 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none transition">
+    </div>
+  </div>
+
+  <!-- NỘI DUNG CHÍNH -->
+  <main class="max-w-5xl mx-auto p-4 flex-grow w-full">
+
+    <!-- ================= 1. TAB: LUYỆN ĐỌC & AI CHẤM PHÁT ÂM ================= -->
+    <section id="panel-speak" class="space-y-4">
+
+      <!-- THANH CHUYỂN ĐỔI CHẾ ĐỘ: ĐỌC TỪ HOẶC ĐỌC CẢ CÂU -->
+      <div class="flex items-center justify-center gap-3 bg-slate-900/80 p-2 rounded-2xl border border-slate-800 w-fit mx-auto">
+        <button id="btn-mode-word" onclick="setSpeakTargetMode('word')" class="px-4 py-1.5 rounded-xl text-xs font-bold bg-red-600 text-white transition">
+          <i class="fa-solid fa-font mr-1"></i> Luyện Đọc Từ
+        </button>
+        <button id="btn-mode-sentence" onclick="setSpeakTargetMode('sentence')" class="px-4 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-400 hover:text-white transition">
+          <i class="fa-solid fa-align-left mr-1"></i> Luyện Đọc Cả Câu (AI Chấm)
+        </button>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-10 shadow-2xl relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+          
+          <!-- KHUNG HIỂN THỊ NỘI DUNG (TỪ HOẶC CÂU) -->
+          <div class="md:col-span-5 flex flex-col items-center justify-center border-b md:border-b-0 md:border-r border-slate-800 pb-6 md:pb-0 md:pr-6 text-center">
+            
+            <!-- A. HIỂN THỊ KHI ĐỌC TỪ -->
+            <div id="box-word-mode" class="flex flex-col items-center">
+              <span id="display-level" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-600/20 text-red-400 border border-red-500/30 mb-2">HSK 4</span>
+              <h2 id="display-hanzi" class="font-['Noto_Serif_SC'] text-6xl md:text-7xl font-bold text-white tracking-normal drop-shadow">爱情</h2>
+              <p id="display-pinyin" class="text-2xl font-bold text-amber-400 mt-2 font-mono">ài qíng</p>
+              <span id="display-meaning" class="text-sm text-slate-300 font-medium text-center mt-2 px-3 py-1 bg-slate-800/80 rounded-xl border border-slate-700/60">Tình yêu</span>
+            </div>
+
+            <!-- B. HIỂN THỊ KHI ĐỌC CẢ CÂU -->
+            <div id="box-sentence-mode" class="hidden flex flex-col items-center">
+              <span id="sent-display-level" class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-600/20 text-red-400 border border-red-500/30 mb-2">HSK 1</span>
+              <h3 id="sent-display-zh" class="font-['Noto_Serif_SC'] text-2xl md:text-3xl font-bold text-white leading-relaxed tracking-wide">我想买一个大苹果。</h3>
+              <p id="sent-display-pinyin" class="text-sm font-mono text-amber-400 mt-2 font-semibold">Wǒ xiǎng mǎi yí gè dà píngguǒ.</p>
+              <p id="sent-display-vi" class="text-xs text-slate-300 italic mt-2 px-3 py-1.5 bg-slate-800/80 rounded-xl border border-slate-700/60 font-sans">Tôi muốn mua một quả táo to.</p>
+            </div>
+
+            <!-- NÚT PHÁT ÂM CHUẨN VÀ ĐỌC CỰC CHẬM -->
+            <div class="flex gap-2 mt-5">
+              <button onclick="speakNative(false)" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-volume-high text-red-400"></i> Chuẩn
+              </button>
+              <button onclick="speakNative(true)" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+                <i class="fa-solid fa-gauge text-blue-400"></i> Đọc cực chậm
+              </button>
+            </div>
+          </div>
+
+          <!-- BỘ ĐO AI VÀ PHẢN HỒI ÂM HỌC -->
+          <div class="md:col-span-7 flex flex-col items-center space-y-4">
+            <div class="flex items-center gap-6">
+              <div class="relative flex items-center justify-center w-28 h-28">
+                <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-slate-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path id="score-meter-bar" class="text-emerald-500 transition-all duration-700" stroke-dasharray="0, 100" stroke-width="3.2" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <div class="absolute flex flex-col items-center">
+                  <span id="score-meter-num" class="text-2xl font-black text-white">0%</span>
+                  <span class="text-[9px] text-slate-400 font-bold uppercase">Điểm AI</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <button id="btn-record" onclick="toggleRecordSpeech()" class="flex items-center justify-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-500 text-white rounded-2xl font-bold shadow-lg shadow-red-600/30 transition active:scale-95 text-sm">
+                  <i id="mic-icon" class="fa-solid fa-microphone"></i>
+                  <span id="record-text">Bấm & Đọc Ngay</span>
+                </button>
+                <button id="btn-replay" onclick="replayUserSpeech()" disabled class="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-750 disabled:opacity-30 disabled:cursor-not-allowed text-slate-300 rounded-xl text-xs font-semibold border border-slate-700 transition">
+                  <i class="fa-solid fa-circle-play text-amber-400"></i> Nghe lại giọng mình
+                </button>
+              </div>
+            </div>
+
+            <!-- CANVAS HIỂN THỊ ĐỒ THỊ CAO ĐỘ (PITCH WAVE) -->
+            <div class="w-full bg-slate-950/80 rounded-2xl p-2 border border-slate-800 flex flex-col items-center">
+              <span class="text-[10px] text-slate-500 font-mono self-start px-2 mb-1">
+                <i class="fa-solid fa-wave-square text-sky-400 mr-1"></i> Biểu đồ phổ thanh điệu thời gian thực:
+              </span>
+              <canvas id="pitch-canvas" width="460" height="70" class="w-full h-16 rounded-lg bg-slate-950"></canvas>
+            </div>
+
+            <div class="w-full grid grid-cols-3 gap-2 text-center text-xs">
+              <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-500 block font-semibold">Khớp Chữ Hán</span>
+                <strong id="metric-text" class="text-slate-300 font-mono">-</strong>
+              </div>
+              <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-500 block font-semibold">Thanh Điệu / Cao Độ</span>
+                <strong id="metric-pitch" class="text-slate-300 font-mono">-</strong>
+              </div>
+              <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                <span class="text-[10px] text-slate-500 block font-semibold">Độ Tự Tin Mic</span>
+                <strong id="metric-conf" class="text-slate-300 font-mono">-</strong>
+              </div>
+            </div>
+
+            <div class="w-full bg-slate-950/80 rounded-2xl p-4 border border-slate-800 text-xs space-y-1.5">
+              <div class="flex items-center justify-between text-slate-400">
+                <span><i class="fa-solid fa-robot text-purple-400 mr-1.5"></i> AI Chẩn Đoán Âm Học:</span>
+                <span id="ai-detected-word" class="italic text-slate-300 font-mono font-bold">Chưa đọc</span>
+              </div>
+              <p id="ai-diagnostic-msg" class="text-slate-400 leading-relaxed">
+                Nhấn micro và phát âm. AI sẽ đo phổ âm và bóc tách từng chữ.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ĐIỀU HƯỚNG TỪ HOẶC CÂU -->
+        <div class="flex items-center justify-between mt-8 pt-4 border-t border-slate-800">
+          <button onclick="currentSpeakMode === 'word' ? navigateWord(-1) : navigateSentence(-1)" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition">
+            <i class="fa-solid fa-chevron-left mr-1"></i> <span id="btn-prev-label">Mục trước</span>
+          </button>
+          <span id="word-progress-label" class="text-xs text-slate-400 font-medium">1 / 50</span>
+          <button onclick="currentSpeakMode === 'word' ? navigateWord(1) : navigateSentence(1)" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white text-xs font-semibold transition">
+            <span id="btn-next-label">Mục tiếp</span> <i class="fa-solid fa-chevron-right ml-1"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 2. TAB: LUYỆN VIẾT CHỮ HÁN ================= -->
+    <section id="panel-write" class="hidden space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-paintbrush text-red-500"></i> Phòng Luyện Viết Bút Thuận
+            </h3>
+            <p class="text-xs text-slate-400">Tập viết theo đúng thứ tự nét chữ Hán chuẩn.</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button onclick="animateAllStrokes()" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+              <i class="fa-solid fa-play"></i> Xem Viết Nét
+            </button>
+            <button onclick="startWritingQuizMode()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+              <i class="fa-solid fa-pencil"></i> Tự Viết Thử
+            </button>
+          </div>
+        </div>
+
+        <div class="py-8 flex flex-col items-center justify-center">
+          <p id="writing-status-hint" class="text-xs text-amber-400 font-semibold mb-4 text-center h-4"></p>
+          <div id="hanzi-target-container" class="flex flex-wrap items-center justify-center gap-6"></div>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex items-center justify-between text-xs text-slate-400">
+          <span><i class="fa-regular fa-lightbulb text-amber-400 mr-1"></i> Ngang trước sổ sau, phẩy trước mác sau, trên trước dưới sau.</span>
+          <span id="writing-char-info" class="font-mono text-slate-200">2 chữ Hán</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3. TAB: PHÒNG LUYỆN TẬP ================= -->
+    <section id="panel-practice" class="hidden space-y-5">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+        
+        <!-- Header Luyện Tập: Điểm số, Cấp độ và Streak -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+          <div class="flex items-center gap-3">
+            <div class="px-3 py-1.5 bg-red-600/20 border border-red-500/30 rounded-xl text-red-400 text-xs font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-fire text-amber-400"></i> Streak: <span id="practice-streak">0</span>
+            </div>
+            <div class="px-3 py-1.5 bg-emerald-600/20 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs font-bold flex items-center gap-1.5">
+              <i class="fa-solid fa-trophy text-yellow-400"></i> Điểm: <span id="practice-score">0</span>
+            </div>
+          </div>
+
+          <!-- Lọc cấp độ bài tập HSK -->
+          <div class="flex items-center gap-1.5 bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs overflow-x-auto">
+            <span class="text-slate-500 font-semibold px-2">Cấp độ:</span>
+            <button onclick="setPracticeLevel('ALL')" class="sub-lvl-btn active" id="plvl-all">Tất cả</button>
+            <button onclick="setPracticeLevel(1)" class="sub-lvl-btn" id="plvl-1">HSK 1</button>
+            <button onclick="setPracticeLevel(2)" class="sub-lvl-btn" id="plvl-2">HSK 2</button>
+            <button onclick="setPracticeLevel(3)" class="sub-lvl-btn" id="plvl-3">HSK 3</button>
+            <button onclick="setPracticeLevel(4)" class="sub-lvl-btn" id="plvl-4">HSK 4</button>
+            <button onclick="setPracticeLevel(5)" class="sub-lvl-btn" id="plvl-5">HSK 5</button>
+            <button onclick="setPracticeLevel(6)" class="sub-lvl-btn" id="plvl-6">HSK 6</button>
+          </div>
+        </div>
+
+        <!-- 4 Chế độ Luyện Tập Chính -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-4">
+          <button onclick="setPracticeMode('listen_word')" id="sub-listen_word" class="sub-tab-btn active-sub">
+            <i class="fa-solid fa-headphones block text-base mb-1"></i>
+            <span>Nghe chọn từ</span>
+          </button>
+          <button onclick="setPracticeMode('listen_fill')" id="sub-listen_fill" class="sub-tab-btn">
+            <i class="fa-solid fa-pen-to-square block text-base mb-1"></i>
+            <span>Nghe điền từ</span>
+          </button>
+          <button onclick="setPracticeMode('read_meaning')" id="sub-read_meaning" class="sub-tab-btn">
+            <i class="fa-solid fa-list-check block text-base mb-1"></i>
+            <span>Trắc nghiệm nghĩa</span>
+          </button>
+          <button onclick="setPracticeMode('build_sentence')" id="sub-build_sentence" class="sub-tab-btn">
+            <i class="fa-solid fa-puzzle-piece block text-base mb-1"></i>
+            <span>Ghép thành câu</span>
+          </button>
+        </div>
+
+        <!-- Khung Bài Tập Chính (Arena) -->
+        <div id="practice-arena" class="min-h-[320px] flex flex-col justify-center items-center py-6">
+          <!-- Render động từ JS -->
+        </div>
+
+        <!-- Khung Phản Hồi Kết Quả -->
+        <div id="practice-feedback" class="hidden transition-all duration-300"></div>
+
+        <!-- Điều Hướng Câu Tiếp -->
+        <div class="flex items-center justify-end pt-3">
+          <button id="btn-next-question" onclick="generateNewQuestion()" class="hidden px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-lg shadow-red-600/30">
+            <span>Câu tiếp theo</span> <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= 4. TAB: KHO TỪ VỰNG ================= -->
+    <section id="panel-dict" class="hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-white text-base">Danh sách từ vựng (<span id="dict-total-count">0</span> từ)</h3>
+          <span class="text-xs text-slate-400">Bấm vào từ để nạp ngay vào phòng luyện đọc và viết</span>
+        </div>
+        <div id="dict-table-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-[600px] overflow-y-auto pr-2"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <audio id="user-playback-audio" class="hidden"></audio>
+
+  <script src="data.js"></script>
+  <script src="ai-pitch.js"></script>
+  <script src="sentence-store.js"></script>
+  <script src="practice.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
